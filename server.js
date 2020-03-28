@@ -8,7 +8,7 @@ if (credentials.key && credentials.cert) {
   server = https.createServer(credentials, app);
   port = 443;
 } else {
-  const http = require('http');
+  const http = require('http'); 
   server = http.createServer(app);
   port = 3000;
 }

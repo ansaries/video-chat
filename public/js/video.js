@@ -2,6 +2,7 @@
   /** @type {SocketIOClient.Socket} */
   const socket = io.connect(window.location.origin);
   const localVideo = document.querySelector('.localVideo');
+  let localStream;
   const remoteVideos = document.querySelector('.remoteVideos');
   const peerConnections = {};
   
@@ -18,7 +19,7 @@
 
   /** @type {MediaStreamConstraints} */
   const constraints = {
-    // audio: true,
+    audio: true,
     video: { facingMode: "user" }
   };
 
@@ -91,11 +92,22 @@
 
   function getUserMediaSuccess(stream) {
     gettingUserMedia = false;
+    localStream = stream;
+
+    localStream.getAudioTracks()[0].onmute = function (e) {
+      console.log('Muted', e);
+    }
     if (localVideo instanceof HTMLVideoElement) {
       !localVideo.srcObject && (localVideo.srcObject = stream);
     }
     socket.emit('ready');
   }
+
+  localVideo.addEventListener('click', function (e) {
+    console.log(localStream.getAudioTracks());
+    localStream.getAudioTracks()[0].enabled = !(localStream.getAudioTracks()[0].enabled) ;
+
+  });
 
   function handleRemoteStreamAdded(stream, id) {
     const remoteVideo = document.createElement('video');
@@ -103,12 +115,17 @@
     remoteVideo.setAttribute("id", id.replace(/[^a-zA-Z]+/g, "").toLowerCase());
     remoteVideo.setAttribute("playsinline", "true");
     remoteVideo.setAttribute("autoplay", "true");
+    remoteVideo.setAttribute('controls', "true");
+
     remoteVideos.appendChild(remoteVideo);
     if (remoteVideos.querySelectorAll("video").length === 1) {
       remoteVideos.setAttribute("class", "one remoteVideos");
     } else {
       remoteVideos.setAttribute("class", "remoteVideos");
     }
+    remoteVideo.addEventListener('click', function() {
+        stream.getAudioTracks()[0].enabled = !(localStream.getAudioTracks()[0].enabled)
+    });
   }
 
   function getUserMediaError(error) {
@@ -143,3 +160,17 @@
 
   getUserMediaDevices();
 })();
+
+class component{
+
+  getMuteState(obj) {
+    return obj.stream.getAudioTracks()[0].enabled;
+  }
+  mute(obj) {
+    obj.stream.getAudioTracks()[0].enabled = !(obj.stream.getAudioTracks()[0].enabled)
+  }
+
+  disableRemoteVideo() {
+    
+  }
+}

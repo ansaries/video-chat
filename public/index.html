@@ -9,8 +9,28 @@
     <link href="/css/main.css" rel="stylesheet">
   </head>
   <body>
-    <video class="localVideo" playsinline autoplay muted></video>
-    <div class="remoteVideos"></div>
+    <div class="local-video-wrapper">
+      <div class="controls">
+        
+      </div>
+      <video class="localVideo" playsinline autoplay muted></video>
+    </div>
+    <div class="global-controls">
+      <!-- Mute All -->
+    </div>
+    <div class="remoteVideos">
+      <div class="remote-video-wrapper" *ngFor="let stream of streams">
+        <div class="controls">
+                    <!-- Mute this stream -->
+                    <button (click) ="mute(stream)">Remove</button>
+                    <button (click) ="disableRemoteVideo(stream)">Remove</button>
+                    <button (click)="hangUp(stream)">Remove</button>
+        </div>
+        <video [id]="stream.id"  [src]="stream">
+        </video>
+      </div>
+
+    </div>
     <script src='/socket.io/socket.io.js'></script>
     <script src="/js/video.js"></script>
 </body>
